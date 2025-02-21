@@ -1,16 +1,33 @@
 @echo off
-echo Installing applications using Winget...
-pause
+echo Checking and installing/upgrading applications using Winget...
+echo.
 
-winget install --id Adobe.Acrobat.Reader.64-bit --silent --accept-package-agreements --accept-source-agreements
-winget install --id Google.Chrome --silent --accept-package-agreements --accept-source-agreements
-winget install --id RARLab.WinRAR --silent --accept-package-agreements --accept-source-agreements
-winget install --id VideoLAN.VLC --silent --accept-package-agreements --accept-source-agreements
-winget install --id Fortinet.FortiClientVPN --silent --accept-package-agreements --accept-source-agreements
-winget install --id Oracle.JDK.8 --silent --accept-package-agreements --accept-source-agreements
-winget install --id HP.SupportAssistant --silent --accept-package-agreements --accept-source-agreements
-winget install --id Microsoft.Teams --silent --accept-package-agreements --accept-source-agreements
-winget install --id Microsoft.Office --silent --accept-package-agreements --accept-source-agreements
+:: Function to check, upgrade, or install application
+setlocal enabledelayedexpansion
 
-echo Installation completed.
+set apps= ^
+    "Adobe.Acrobat.Reader.64-bit" ^
+    "Google.Chrome" ^
+    "RARLab.WinRAR" ^
+    "VideoLAN.VLC" ^
+    "Fortinet.FortiClientVPN" ^
+    "Oracle.JDK.8" ^
+    "HP.SupportAssistant" ^
+    "Microsoft.Teams" ^
+    "Microsoft.Office"
+
+for %%A in (%apps%) do (
+    echo Checking %%A...
+    winget list --id %%A > nul 2>&1
+    if %errorlevel% == 0 (
+        echo %%A is already installed. Checking for updates...
+        winget upgrade --id %%A --silent --accept-package-agreements --accept-source-agreements
+    ) else (
+        echo %%A is not installed. Installing now...
+        winget install --id %%A --silent --accept-package-agreements --accept-source-agreements
+    )
+    echo.
+)
+
+echo Process completed.
 pause
